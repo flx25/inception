@@ -7,7 +7,7 @@ all:
 	@mkdir -p $(WORDPRESS_DATA_PATH)
 	@docker-compose -f $(PATH_YML) up -d --build
 
-re: clean all
+re: fclean all
 
 stop:
 	@docker-compose -f $(PATH_YML) stop
