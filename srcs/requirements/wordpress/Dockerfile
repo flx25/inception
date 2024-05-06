@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM debian:bullseye
 
 RUN apt update -y
 RUN apt upgrade -y
@@ -16,7 +16,7 @@ RUN cd /var/www && tar -xzf wordpress-6.0-de_DE.tar.gz && rm wordpress-6.0-de_DE
 
 RUN		chown -R root:root /var/www/wordpress
 
-RUN apt install php
+RUN apt install php -y
 
 COPY conf/www.conf /etc/php/7.3/fpm/pool.d/www.conf
 
