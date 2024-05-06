@@ -1,11 +1,12 @@
 PATH_YML = ./srcs/docker-compose.yml
-MARIADB_DATA_PATH = $(HOME)/mariadb
-WORDPRESS_DATA_PATH = $(HOME)/wordpress
+MARIADB_DATA_PATH = $(HOME)/data/mariadb
+WORDPRESS_DATA_PATH = $(HOME)/data/wordpress
 
 all:
-	@mkdir -p $(MARIADB_DATA_PATH)
-	@mkdir -p $(WORDPRESS_DATA_PATH)
-	@docker-compose -f $(PATH_YML) up -d --build
+	@sudo mkdir -p $(MARIADB_DATA_PATH)
+	@sudo mkdir -p $(WORDPRESS_DATA_PATH)
+	@docker-compose -f $(PATH_YML) build --no-cache && docker-compose -f $(PATH_YML) up -d
+	#@docker-compose -f $(PATH_YML) up -d --build --no-cache
 
 re: fclean all
 
@@ -19,5 +20,9 @@ fclean: clean
 	@rm -rf $(MARIADB_DATA_PATH)
 	@rm -rf $(WORDPRESS_DATA_PATH)
 	@docker system prune -af
+
+reset: fclean 
+	@sudo rm -rf ${HOME}/data/wordpress
+	@sudo rm -rf ${HOME}/data/mariadb
 
 .PHONY: all re stop clean fclean 
