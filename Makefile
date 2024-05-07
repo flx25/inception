@@ -5,6 +5,7 @@ WORDPRESS_DATA_PATH = $(HOME)/data/wordpress
 all:
 	@sudo mkdir -p $(MARIADB_DATA_PATH)
 	@sudo mkdir -p $(WORDPRESS_DATA_PATH)
+	#To build with cache
 	@docker-compose -f $(PATH_YML) up -d --build
 	#To build without cache
 	#@docker-compose -f $(PATH_YML) build --no-cache && docker-compose -f $(PATH_YML) up -d
