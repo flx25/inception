@@ -1,9 +1,25 @@
 #!/bin/bash
-service mysql start;
-mysql -e "CREATE DATABASE IF NOT EXISTS \`${SQL_DATABASE}\`;"
-mysql -e "CREATE USER IF NOT EXISTS \`${SQL_USER}\`@'localhost' IDENTIFIED BY '${SQL_PASSWORD}';"
-mysql -e "GRANT ALL PRIVILEGES ON \`${SQL_DATABASE}\`.* TO \`${SQL_USER}\`@'%' IDENTIFIED BY '${SQL_PASSWORD}';"
-mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${SQL_ROOT_PASSWORD}';"
-mysql -e "FLUSH PRIVILEGES;"
-mysqladmin -u root -p$SQL_ROOT_PASSWORD shutdown
+
+set -e
+
+if [ ! -e /var/lib/mysql/.inception_firstrun ]; then
+    mysql_install_db \
+        --auth-root-authentication-method=socket \
+        --datadir=/var/lib/mysql \
+        --skip-test-db \
+        --user=mysql \
+        --group=mysql >/dev/null
+    mysqld_safe &
+    mysqladmin ping -u root --silent --wait >/dev/null
+    cat << EOF | mysql --protocol=socket -u root -p=
+CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;
+CREATE USER IF NOT EXISTS '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD';
+GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%';
+GRANT ALL PRIVILEGES on *.* to 'root'@'%' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';
+FLUSH PRIVILEGES;
+EOF
+    mysqladmin shutdown
+    touch /var/lib/mysql/.inception_firstrun
+fi
+
 exec mysqld_safe
